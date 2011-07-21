@@ -7,6 +7,7 @@ use App::grindperl;
 my $app = App::grindperl->new;
 exit $app->run;
 
+# PODNAME: grindperl
 # ABSTRACT: Command-line tool to help build and test bleadperl
 
 __END__
@@ -19,7 +20,7 @@ These commands are intended to be run from within a clone of
 the Perl git repository.
 
   # Configure && make && make test (in parallel)
-  $ grindperl 
+  $ grindperl
 
   # Configure && make && make test_porting (in parallel)
   $ grindperl --porting
@@ -27,8 +28,8 @@ the Perl git repository.
   # Same as first example, but without threads
   $ grindperl --no-threads
 
-  # Configure/make/test and install without manpages
-  $ grindperl --prefix=/opt/perl/blead --install --no-man
+  # Configure/make/test and install
+  $ grindperl --prefix=/opt/perl/blead --install
 
 
 = DESCRIPTION
@@ -41,9 +42,9 @@ mine on CPAN to help new (or less automated) contributors.
 Instead of typing this:
 
   $ ./Configure -des -Duse_devel -Dcc='ccache=gcc' \
-    -Dprefix=/opt/perl/blead-$(git describe) -DDEBUGGING \
+    -Dprefix=/tmp/blead-$(git describe) -DDEBUGGING \
     -Dusethreads
-  $ make -j 9
+  $ make -j 9 test_prep
   $ TEST_JOBS=9 make test_harness
 
 You can just type this:
@@ -99,7 +100,8 @@ is false.
 
 == --output FILE or -o FILE
 
-Instructs {grindperl} to merge STDERR and STDOUT and safe filename to capture build/test output
+Instructs {grindperl} to merge STDERR and STDOUT and redirect output
+to the given file to capture build/test results.
 
 == --prefix PATH
 
@@ -110,9 +112,9 @@ If not set, a default prefix will be calculated relative to {--install_root}.
 If a {.git} directory exists, the prefix will resemble {ROOT/BRANCH-DESCRIBE}
 if a branch can be determined or {ROOT/fromgit-DESCRIBE} if the branch cannot
 be determined (as from a detached HEAD).  E.g. given the default {--install_root}
-of {/opt/perl}, the prefix for the blead branch might resemble this:
+of {/tmp}, the prefix for the blead branch might resemble this:
 
-  /opt/perl/blead-v5.15.1-22-g5213914
+  /tmp/blead-v5.15.1-22-g5213914
 
 This ensures the the prefix is different for different places in the
 commit history.
@@ -121,7 +123,9 @@ If there is no {.git} directory, then the prefix will resemble
 {ROOT/DIRNAME-EPOCH} where DIRNAME is the name of the current directory
 and EPOCH is the number of epoch seconds.
 
-These choices of prefix ensure that installing different grindperl runs
+  /tmp/perl-5.15.1-1311278560
+
+These prefix choices ensure that installing different grindperl runs
 will generally not clobber each other.
 
 == --install_root
@@ -167,11 +171,22 @@ these require a space between the opton and the key or key/value pair.
 
 = CONFIGURATION FILE
 
-XXX need one
+You can put command line options into a configuration file, one per line,
+and they will be prepended to {@ARGV} before options are processed.  For
+example, here is what I have in my config file.
+
+    --install_root=/opt/perl
+    -D cc='ccache gcc'
+    -D cf_by=dagolden
+    -D cf_email='dagolden@cpan.org'
+    -D perladmin='dagolden@cpan.org'
+
+To edit the config file, be sure your {EDITOR} environment variable is set
+and then run {grindperl --edit}.
 
 = CAVEATS
 
-* You must have git installed.
+* You must have git installed and in your path
 * This depends on certain shell redirection constructs and is unlikely to
 work on non-POSIX systems
 

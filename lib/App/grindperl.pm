@@ -10,32 +10,41 @@ use Getopt::Lucid ':all';
 use Path::Class;
 use Carp qw/carp croak/;
 use File::Copy qw/copy/;
+use File::HomeDir 0.98;
 use namespace::autoclean;
 
 sub new {
   my $class = shift;
 
-  croak "Doesn't look like a perl source dirctory" unless -f "perl.c";
+  my $self = bless {}, $class;
+
+  if ( -r $self->config_file ) {
+    unshift @ARGV, $self->read_config_file;
+  }
 
   my $opt = Getopt::Lucid->getopt([
     Param("jobs|j")->default(9),
     Param("testjobs|t")->default(9),
     Param("output|o"),
-    Param("prefix"),
     Param("install_root")->default("/tmp"),
-    Switch("porting|p")->default(0),
-    Switch("install"),
+    Param("prefix"),
     Switch("debugging")->default(1),
+    Switch("threads")->default(1),
+    Switch("porting|p"),
+    Switch("install"),
     Switch("config"),
     Switch("cache"),
     Switch("man"),
+    Switch("edit"),
     Switch("verbose|v"),
-    Switch("threads")->default(1),
     Keypair("define|D"),
     List("undefine|U"),
   ]);
 
-  return bless { opt => $opt, is_git => -d '.git' }, $class;
+  $self->{opt} = $opt;
+  $self->{is_git} = -d '.git';
+
+  return $self;
 }
 
 sub opt { return $_[0]->{opt} }
@@ -47,15 +56,7 @@ sub logfile { return $_[0]->opt->get_output };
 sub vlog {
   my ($self, @msg) = @_;
   return unless $self->opt->get_verbose;
-  say for map { s/\n$//; $_ } @msg;
-}
-
-sub default_args {
-  return qw(
-    -des -Dcc='ccache gcc' -Dusedevel
-    -Dcf_by=dagolden
-    -Dcf_email='dagolden@cpan.org' -Dperladmin='dagolden@cpan.org'
-  );
+  say for map { (my $s = $_) =~ s/\n$//; $s } @msg;
 }
 
 sub prefix {
@@ -90,7 +91,7 @@ sub configure_args {
   my ($self) = @_;
   my %defines = $self->opt->get_define;
   my @undefines = $self->opt->get_undefine;
-  my @args = $self->default_args;
+  my @args = qw/-des -Dusedevel/;
   push @args, "-Dusethreads" if $self->opt->get_threads;
   push @args, "-DDEBUGGING" if $self->opt->get_debugging;
   push @args, "-r" if $self->opt->get_cache;
@@ -105,16 +106,26 @@ sub configure_args {
 
 sub cache_dir {
   my ($self) = @_;
-  my $app = file($0)->basename;
-  return dir( $ENV{HOME}, ".$app", "cache" )->stringify;
+  return dir(File::HomeDir->my_dist_data(__PACKAGE__, {create=>1}))->stringify;
 }
 
 sub cache_file {
   my ($self,$file) = @_;
   croak "No filename given to cache_file()"
     unless defined $file && length $file;
-  my $app = file($0)->basename;
   return file( $self->cache_dir, $file )->stringify;
+}
+
+sub config_file {
+  my ($self) = @_;
+  my $config_dir = dir(File::HomeDir->my_dist_config(__PACKAGE__, {create=>1}));
+  return $config_dir->file("config");
+}
+
+sub read_config_file {
+  my ($self) = @_;
+  open my $fh, "<", $self->config_file;
+  return map { chomp; $_ } <$fh>;
 }
 
 sub do_cmd {
@@ -172,6 +183,20 @@ sub configure {
 sub run {
   my ($self) = @_;
 
+  if ( $self->opt->get_edit ) {
+    my $cf_file = $self->config_file;
+    if ( $ENV{EDITOR} ) {
+      system( $ENV{EDITOR}, $cf_file )
+          and die "Error editing config file: $!\n";
+    }
+    else {
+      say "No EDITOR set. Edit $cf_file manually.";
+    }
+    exit 0;
+  }
+
+  croak "Doesn't look like a perl source dirctory" unless -f "perl.c";
+
   $self->verify_dir
     or croak($self->prefix . " does not appear to be writable");
 
@@ -222,26 +247,39 @@ sub run {
 
 # ABSTRACT:  Guts of the grindperl tool
 
-=for Pod::Coverage method_names_here
+=for Pod::Coverage
+new
+opt
+is_git
+logfile
+vlog
+default_args
+prefix
+configure_args
+cache_dir
+cache_file
+config_file
+read_config_file
+do_cmd
+verify_dir
+configure
+run
 
 =begin wikidoc
 
 = SYNOPSIS
 
   use App::grindperl;
+  my $app = App::grindperl->new;
+  exit $app->run;
 
 = DESCRIPTION
 
-This module might be cool, but you'd never know it from the lack
-of documentation.
-
-= USAGE
-
-Good luck!
+This module contains the guts of the [grindperl] program.
 
 = SEE ALSO
 
-Maybe other modules do related things.
+[grindperl]
 
 =end wikidoc
 
