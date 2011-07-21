@@ -72,18 +72,22 @@ sub prefix {
       # HEAD not a symbolic ref?
       $branch = "fromgit";
     }
-    els {
+    else {
       chomp $branch;
-      $branch =~ s{refs/heads}{};
+      $branch =~ s{refs/heads/}{};
       $branch =~ s{/}{-}g;
     }
     my $describe = qx/git describe/;
+    if ( $? ) {
+      # can't describe?
+      $describe = 'unknown-commit';
+    }
     chomp $describe;
-    return "$root/$branch-$describe";
+    return dir($root)->subdir("$branch-$describe");
   }
   else {
     my $perldir = dir()->absolute->basename;
-    return "$root/$perldir-" . time();
+    return dir($root)->subdir("$perldir-" . time());
   }
 }
 
@@ -106,7 +110,7 @@ sub configure_args {
 
 sub cache_dir {
   my ($self) = @_;
-  return dir(File::HomeDir->my_dist_data(__PACKAGE__, {create=>1}))->stringify;
+  return dir(File::HomeDir->my_dist_data('App-grindperl', {create=>1}))->stringify;
 }
 
 sub cache_file {
@@ -118,14 +122,19 @@ sub cache_file {
 
 sub config_file {
   my ($self) = @_;
-  my $config_dir = dir(File::HomeDir->my_dist_config(__PACKAGE__, {create=>1}));
-  return $config_dir->file("config");
+  my $config_dir = dir(File::HomeDir->my_dist_config('App-grindperl', {create=>1}));
+  return $config_dir->file("grindperl.conf");
 }
 
 sub read_config_file {
   my ($self) = @_;
   open my $fh, "<", $self->config_file;
-  return map { chomp; $_ } <$fh>;
+  my @args;
+  while ( my $line = <$fh> ) {
+    chomp $line;
+    push @args, split " ", $line, 2;
+  }
+  return @args;
 }
 
 sub do_cmd {
@@ -143,7 +152,7 @@ sub do_cmd {
 sub verify_dir {
   my ($self) = @_;
   my $prefix = dir($self->prefix);
-  return -w $prefix->dirname;
+  return -w $prefix->parent;
 }
 
 sub configure {
@@ -195,10 +204,12 @@ sub run {
     exit 0;
   }
 
-  croak "Doesn't look like a perl source dirctory" unless -f "perl.c";
+  die "This doesn't look like a perl source directory.\n"
+    unless -f "perl.c";
 
-  $self->verify_dir
-    or croak($self->prefix . " does not appear to be writable");
+  my $prefix = $self->prefix;
+  die "Can't install to $prefix\: parent directory is not writeable\n"
+    unless -w dir($prefix)->parent;
 
   if ( $self->is_git ) {
     $self->do_cmd("git clean -dxf")
