@@ -1,0 +1,182 @@
+use v5.10.0;
+use strict;
+use warnings;
+# VERSION
+
+use App::grindperl;
+my $app = App::grindperl->new;
+exit $app->run;
+
+# ABSTRACT: Command-line tool to help build and test bleadperl
+
+__END__
+
+=begin wikidoc
+
+= SYNOPSIS
+
+These commands are intended to be run from within a clone of
+the Perl git repository.
+
+  # Configure && make && make test (in parallel)
+  $ grindperl 
+
+  # Configure && make && make test_porting (in parallel)
+  $ grindperl --porting
+
+  # Same as first example, but without threads
+  $ grindperl --no-threads
+
+  # Configure/make/test and install without manpages
+  $ grindperl --prefix=/opt/perl/blead --install --no-man
+
+
+= DESCRIPTION
+
+Hacking on the Perl source tree requires one to regularly build and test.  The
+{grindperl} tool helps automate some common configuration, build and test
+tasks.  Most Perl 5 porters have written something like this and I'm putting
+mine on CPAN to help new (or less automated) contributors.
+
+Instead of typing this:
+
+  $ ./Configure -des -Duse_devel -Dcc='ccache=gcc' \
+    -Dprefix=/opt/perl/blead-$(git describe) -DDEBUGGING \
+    -Dusethreads
+  $ make -j 9
+  $ TEST_JOBS=9 make test_harness
+
+You can just type this:
+
+  $ grindperl
+
+If you want to run {make test_porting} before committing or before
+merging a submitted patch -- which is strongly encouraged -- that is
+as easy as:
+
+  $ grindperl --porting
+
+Generally, the following steps are taken (unless modified by options):
+
+* clean the source directory, with {git clean -dxf} or {make distclean}
+as necessary
+* run {Configure} with desired options
+* run either {make test_harness} or {make test_porting} or {make test_prep}
+depending on various options
+
+If anything fails along the way, {grindperl} will stop with an error message.
+
+= OPTIONS
+
+Any boolean options that default to true may be negated by prefixing their long
+form with {no-}, e.g. {--no-threads}.
+
+== --config
+
+Boolean flag.  When set, {grindperl} will halt after running {Configure}.
+Default is false.
+
+== --jobs=N or -j N
+
+Controls how many parallel make jobs to run.  Defaults to 9.
+
+== --testjobs=N or -t N
+
+Controls the number of parallel test jobs to run.  Defaults to 9.
+Setting this to 0 will run {make test_prep} but will not run tests.
+
+== --porting
+
+Boolean flag.  When set, {make test_porting} will be run instead
+of {make test_harness}.  The number of jobs to run in parallel
+will still be based on the {--testjobs} option.  Default is false.
+
+== --install
+
+Boolean flag.  When set, {grindperl} will run {make install} after all
+other steps.  Be sure to set {--prefix} to a writeable destination.  Default
+is false.
+
+== --output FILE or -o FILE
+
+Instructs {grindperl} to merge STDERR and STDOUT and safe filename to capture build/test output
+
+== --prefix PATH
+
+Sets an explicit installation path via {-Dprefix=...}.
+
+If not set, a default prefix will be calculated relative to {--install_root}.
+
+If a {.git} directory exists, the prefix will resemble {ROOT/BRANCH-DESCRIBE}
+if a branch can be determined or {ROOT/fromgit-DESCRIBE} if the branch cannot
+be determined (as from a detached HEAD).  E.g. given the default {--install_root}
+of {/opt/perl}, the prefix for the blead branch might resemble this:
+
+  /opt/perl/blead-v5.15.1-22-g5213914
+
+This ensures the the prefix is different for different places in the
+commit history.
+
+If there is no {.git} directory, then the prefix will resemble
+{ROOT/DIRNAME-EPOCH} where DIRNAME is the name of the current directory
+and EPOCH is the number of epoch seconds.
+
+These choices of prefix ensure that installing different grindperl runs
+will generally not clobber each other.
+
+== --install_root
+
+A base path for a generated default {--prefix}. The default install root
+is {/tmp}.  This needs to be a directory for which you have write
+permissions.
+
+== --debugging
+
+Boolean flag.  Sets {-DDEBUGGING}.  Default is true.
+
+== --threads
+
+Boolean flag.  Sets {-Dusethreads}.  Default is true.
+
+== --cache
+
+Boolean flag.  When true, {grindperl} will save your {config.sh}
+and {Policy.sh} files to a hidden cache file.  If these files
+exist, it will restore them and run {Configure} with the {-r} option.
+
+Using cached config files from a different commit can break things
+and is not recommended.
+
+Defaults to false.
+
+== --man
+
+Boolean flag.  When false, {grindperl} will disable man diretories
+and man files will not be generated or installed.  Defaults to false.
+
+== --verbose or -v
+
+Outputs some extra progress messages and warninsg.
+
+== --define KEY=VALUE or -D KEY=VALUE
+== --undefine KEY or -U KEY
+
+May be specified multiple times with different values of KEY.  These
+set the {-D} and {-U} options for {Configure}.  Not that unlike {Configure},
+these require a space between the opton and the key or key/value pair.
+
+= CONFIGURATION FILE
+
+XXX need one
+
+= CAVEATS
+
+* You must have git installed.
+* This depends on certain shell redirection constructs and is unlikely to
+work on non-POSIX systems
+
+=end wikidoc
+
+=cut
+
+# vim: ts=2 sts=2 sw=2 et:
