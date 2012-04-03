@@ -95,7 +95,7 @@ sub configure_args {
   my ($self) = @_;
   my %defines = $self->opt->get_define;
   my @undefines = $self->opt->get_undefine;
-  my @args = qw/-des -Dusedevel/;
+  my @args = qw/-des -Dusedevel -Uversiononly/;
   push @args, "-Dusethreads" if $self->opt->get_threads;
   push @args, "-DDEBUGGING" if $self->opt->get_debugging;
   push @args, "-r" if $self->opt->get_cache;
@@ -233,10 +233,15 @@ sub run {
       $self->do_cmd("make -j $jobs test_porting")
         or croak ("make test_porting failed");
     }
-    else {
+    elsif ( grep { /test_harness/ } do { local(@ARGV,$/) = "Makefile"; <>} ) {
       $self->vlog("Running 'make test_harness' with $test_jobs jobs");
       $self->do_cmd("make -j $jobs test_harness")
-        or croak ("make test_harness failed");
+          or croak ("make test_harness failed");
+    }
+    else {
+      $self->vlog("Running 'make test' with $test_jobs jobs");
+      $self->do_cmd("make -j $jobs test")
+          or croak ("make test failed");
     }
   }
   else {
