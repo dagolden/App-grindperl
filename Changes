@@ -2,6 +2,11 @@ Revision history for App-grindperl
 
 {{$NEXT}}
 
+    [CHANGED]
+
+    - default installation directory is now set to File::Spec->tmpdir,
+      not hardcoded as '/tmp'
+
 0.001     2011-07-21 16:38:44 America/New_York
 
     - First release to CPAN

@@ -8,6 +8,7 @@ package App::grindperl;
 use autodie;
 use Getopt::Lucid ':all';
 use Path::Class;
+use File::Spec;
 use Carp qw/carp croak/;
 use File::Copy qw/copy/;
 use File::HomeDir 0.98;
@@ -26,7 +27,7 @@ sub new {
     Param("jobs|j")->default(9),
     Param("testjobs|t")->default(9),
     Param("output|o"),
-    Param("install_root")->default("/tmp"),
+    Param("install_root")->default(File::Spec->tmpdir),
     Param("prefix"),
     Switch("debugging")->default(1),
     Switch("threads")->default(1),
