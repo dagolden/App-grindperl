@@ -261,7 +261,7 @@ sub run {
       or croak("make install failed!");
   }
 
-  return 1;
+  return 0; # usually passed to exit
 }
 
 1;
