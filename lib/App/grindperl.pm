@@ -31,6 +31,7 @@ sub new {
     Param("prefix"),
     Switch("debugging")->default(1),
     Switch("threads")->default(1),
+    Switch("32"),
     Switch("porting|p"),
     Switch("install"),
     Switch("config"),
@@ -99,6 +100,9 @@ sub configure_args {
   my @args = qw/-des -Dusedevel -Uversiononly/;
   push @args, "-Dusethreads" if $self->opt->get_threads;
   push @args, "-DDEBUGGING" if $self->opt->get_debugging;
+  push @args, "-Accflags=-m32", "-Alddlflags=-m32", "-Aldflags=-m32",
+    "-Uuse64bitint", "-Uuse64bitall", "-Uusemorebits"
+    if $self->opt->get_32;
   push @args, "-r" if $self->opt->get_cache;
   if ( ! $self->opt->get_man ) {
     push @args, qw/-Dman1dir=none -Dman3dir=none/;

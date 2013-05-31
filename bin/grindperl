@@ -170,6 +170,12 @@ May be specified multiple times with different values of KEY.  These
 set the {-D} and {-U} options for {Configure}.  Not that unlike {Configure},
 these require a space between the opton and the key or key/value pair.
 
+== --32 (EXPERIMENTAL)
+
+This experimental flag tries to force as much 32-bitness as possible, even on
+a 64 bit operating system.  It's very hacky, messes with compiler and linker
+flags and is not guaranteed on all platforms.
+
 = CONFIGURATION FILE
 
 You can put command line options into a configuration file, one per line,
