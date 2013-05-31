@@ -1,3 +1,7 @@
+=pod
+
+=encoding utf-8
+
 =head1 NAME
 
 App::grindperl - Guts of the grindperl tool
@@ -37,15 +41,15 @@ run
 
 L<grindperl>
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 
 =head2 Bugs / Feature Requests
 
-Please report any bugs or feature requests by email to C<bug-app-grindperl at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/Public/Dist/Display.html?Name=App-grindperl>. You will be automatically notified of any
-progress on the request by the system.
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/app-grindperl/issues>.
+You will be notified automatically of any progress on your issue.
 
 =head2 Source Code
 
@@ -54,7 +58,7 @@ public review and contribution under the terms of the license.
 
 L<https://github.com/dagolden/app-grindperl>
 
-  git clone https://github.com/dagolden/app-grindperl.git
+  git clone git://github.com/dagolden/app-grindperl.git
 
 =head1 AUTHOR
 

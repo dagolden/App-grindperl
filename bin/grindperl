@@ -156,19 +156,19 @@ Defaults to false.
 
 == --man
 
-Boolean flag.  When false, {grindperl} will disable man diretories
+Boolean flag.  When false, {grindperl} will disable man directories
 and man files will not be generated or installed.  Defaults to false.
 
 == --verbose or -v
 
-Outputs some extra progress messages and warninsg.
+Outputs some extra progress messages and warnings.
 
 == --define KEY=VALUE or -D KEY=VALUE
 == --undefine KEY or -U KEY
 
 May be specified multiple times with different values of KEY.  These
 set the {-D} and {-U} options for {Configure}.  Not that unlike {Configure},
-these require a space between the opton and the key or key/value pair.
+these require a space between the option and the key or key/value pair.
 
 == --32 (EXPERIMENTAL)
 
