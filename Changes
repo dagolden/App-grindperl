@@ -2,10 +2,19 @@ Revision history for App-grindperl
 
 {{$NEXT}}
 
+    [ADDED]
+
+    - experimental "--32" option to try to force 32 bit builds even on 64
+      bit machines
+
     [CHANGED]
 
     - default installation directory is now set to File::Spec->tmpdir,
       not hardcoded as '/tmp'
+
+    [FIXED]
+
+    - exit code was accidentally inverted
 
 0.001     2011-07-21 16:38:44 America/New_York
 
