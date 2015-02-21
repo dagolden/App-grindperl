@@ -42,7 +42,7 @@ mine on CPAN to help new (or less automated) contributors.
 
 Instead of typing this:
 
-  $ ./Configure -des -Duse_devel -Dcc='ccache=gcc' \
+  $ ./Configure -des -Dusedevel -Dcc='ccache=gcc' \
     -Dprefix=/tmp/blead-$(git describe) -DDEBUGGING \
     -Dusethreads
   $ make -j 9 test_prep
