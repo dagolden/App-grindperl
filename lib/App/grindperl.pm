@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package App::grindperl;
-# VERSION
+our $VERSION = '0.003';
 
 use autodie;
 use Getopt::Lucid ':all';
