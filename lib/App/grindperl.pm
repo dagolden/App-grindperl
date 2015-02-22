@@ -286,23 +286,19 @@ verify_dir
 configure
 run
 
-=begin wikidoc
-
-= SYNOPSIS
+=head1 SYNOPSIS
 
   use App::grindperl;
   my $app = App::grindperl->new;
   exit $app->run;
 
-= DESCRIPTION
+=head1 DESCRIPTION
 
-This module contains the guts of the [grindperl] program.
+This module contains the guts of the L<grindperl> program.
 
-= SEE ALSO
+=head1 SEE ALSO
 
-[grindperl]
-
-=end wikidoc
+L<grindperl>
 
 =cut
 

@@ -13,9 +13,7 @@ exit $app->run;
 
 __END__
 
-=begin wikidoc
-
-= SYNOPSIS
+=head1 SYNOPSIS
 
 These commands are intended to be run from within a clone of
 the Perl git repository.
@@ -33,10 +31,10 @@ the Perl git repository.
   $ grindperl --prefix=/opt/perl/blead --install
 
 
-= DESCRIPTION
+=head1 DESCRIPTION
 
 Hacking on the Perl source tree requires one to regularly build and test.  The
-{grindperl} tool helps automate some common configuration, build and test
+C<< grindperl >> tool helps automate some common configuration, build and test
 tasks.  Most Perl 5 porters have written something like this and I'm putting
 mine on CPAN to help new (or less automated) contributors.
 
@@ -52,7 +50,7 @@ You can just type this:
 
   $ grindperl
 
-If you want to run {make test_porting} before committing or before
+If you want to run C<< make test_porting >> before committing or before
 merging a submitted patch -- which is strongly encouraged -- that is
 as easy as:
 
@@ -60,68 +58,69 @@ as easy as:
 
 Generally, the following steps are taken (unless modified by options):
 
-* clean the source directory, with {git clean -dxf} or {make distclean}
+=for :list
+* clean the source directory, with C<< git clean -dxf >> or C<< make distclean >>
 as necessary
-* run {Configure} with desired options
-* run either {make test_harness} or {make test_porting} or {make test_prep}
+* run C<< Configure >> with desired options
+* run either C<< make test_harness >> or C<< make test_porting >> or C<< make test_prep >>
 depending on various options
 
-If anything fails along the way, {grindperl} will stop with an error message.
+If anything fails along the way, C<< grindperl >> will stop with an error message.
 
-= OPTIONS
+=head1 OPTIONS
 
 Any boolean options that default to true may be negated by prefixing their long
-form with {no-}, e.g. {--no-threads}.
+form with C<< no- >>, e.g. C<< --no-threads >>.
 
-== --config
+=head2 --config
 
-Boolean flag.  When set, {grindperl} will halt after running {Configure}.
+Boolean flag.  When set, C<< grindperl >> will halt after running C<< Configure >>.
 Default is false.
 
-== --jobs=N or -j N
+=head2 --jobs=N or -j N
 
 Controls how many parallel make jobs to run.  Defaults to 9.
 
-== --testjobs=N or -t N
+=head2 --testjobs=N or -t N
 
 Controls the number of parallel test jobs to run.  Defaults to 9.
-Setting this to 0 will run {make test_prep} but will not run tests.
+Setting this to 0 will run C<< make test_prep >> but will not run tests.
 
-== --porting
+=head2 --porting
 
-Boolean flag.  When set, {make test_porting} will be run instead
-of {make test_harness}.  The number of jobs to run in parallel
-will still be based on the {--testjobs} option.  Default is false.
+Boolean flag.  When set, C<< make test_porting >> will be run instead
+of C<< make test_harness >>.  The number of jobs to run in parallel
+will still be based on the C<< --testjobs >> option.  Default is false.
 
-== --install
+=head2 --install
 
-Boolean flag.  When set, {grindperl} will run {make install} after all
-other steps.  Be sure to set {--prefix} to a writeable destination.  Default
+Boolean flag.  When set, C<< grindperl >> will run C<< make install >> after all
+other steps.  Be sure to set C<< --prefix >> to a writeable destination.  Default
 is false.
 
-== --output FILE or -o FILE
+=head2 --output FILE or -o FILE
 
-Instructs {grindperl} to merge STDERR and STDOUT and redirect output
+Instructs C<< grindperl >> to merge STDERR and STDOUT and redirect output
 to the given file to capture build/test results.
 
-== --prefix PATH
+=head2 --prefix PATH
 
-Sets an explicit installation path via {-Dprefix=...}.
+Sets an explicit installation path via C<< -Dprefix=... >>.
 
-If not set, a default prefix will be calculated relative to {--install_root}.
+If not set, a default prefix will be calculated relative to C<< --install_root >>.
 
-If a {.git} directory exists, the prefix will resemble {ROOT/BRANCH-DESCRIBE}
-if a branch can be determined or {ROOT/fromgit-DESCRIBE} if the branch cannot
-be determined (as from a detached HEAD).  E.g. given the default {--install_root}
-of {/tmp}, the prefix for the blead branch might resemble this:
+If a C<< .git >> directory exists, the prefix will resemble C<< ROOT/BRANCH-DESCRIBE >>
+if a branch can be determined or C<< ROOT/fromgit-DESCRIBE >> if the branch cannot
+be determined (as from a detached HEAD).  E.g. given the default C<< --install_root >>
+of C<< /tmp >>, the prefix for the blead branch might resemble this:
 
   /tmp/blead-v5.15.1-22-g5213914
 
 This ensures the the prefix is different for different places in the
 commit history.
 
-If there is no {.git} directory, then the prefix will resemble
-{ROOT/DIRNAME-EPOCH} where DIRNAME is the name of the current directory
+If there is no C<< .git >> directory, then the prefix will resemble
+C<< ROOT/DIRNAME-EPOCH >> where DIRNAME is the name of the current directory
 and EPOCH is the number of epoch seconds.
 
   /tmp/perl-5.15.1-1311278560
@@ -129,57 +128,58 @@ and EPOCH is the number of epoch seconds.
 These prefix choices ensure that installing different grindperl runs
 will generally not clobber each other.
 
-== --install_root
+=head2 --install_root
 
-A base path for a generated default {--prefix}. The default install root
-is {/tmp}.  This needs to be a directory for which you have write
+A base path for a generated default C<< --prefix >>. The default install root
+is C<< /tmp >>.  This needs to be a directory for which you have write
 permissions.
 
-== --debugging
+=head2 --debugging
 
-Boolean flag.  Sets {-DDEBUGGING}.  Default is true.
+Boolean flag.  Sets C<< -DDEBUGGING >>.  Default is true.
 
-== --threads
+=head2 --threads
 
-Boolean flag.  Sets {-Dusethreads}.  Default is true.
+Boolean flag.  Sets C<< -Dusethreads >>.  Default is true.
 
-== --cache
+=head2 --cache
 
-Boolean flag.  When true, {grindperl} will save your {config.sh}
-and {Policy.sh} files to a hidden cache file.  If these files
-exist, it will restore them and run {Configure} with the {-r} option.
+Boolean flag.  When true, C<< grindperl >> will save your C<< config.sh >>
+and C<< Policy.sh >> files to a hidden cache file.  If these files
+exist, it will restore them and run C<< Configure >> with the C<< -r >> option.
 
 Using cached config files from a different commit can break things
 and is not recommended.
 
 Defaults to false.
 
-== --man
+=head2 --man
 
-Boolean flag.  When false, {grindperl} will disable man directories
+Boolean flag.  When false, C<< grindperl >> will disable man directories
 and man files will not be generated or installed.  Defaults to false.
 
-== --verbose or -v
+=head2 --verbose or -v
 
 Outputs some extra progress messages and warnings.
 
-== --define KEY=VALUE or -D KEY=VALUE
-== --undefine KEY or -U KEY
+=head2 --define KEY=VALUE or -D KEY=VALUE
+
+=head2 --undefine KEY or -U KEY
 
 May be specified multiple times with different values of KEY.  These
-set the {-D} and {-U} options for {Configure}.  Not that unlike {Configure},
+set the C<< -D >> and C<< -U >> options for C<< Configure >>.  Not that unlike C<< Configure >>,
 these require a space between the option and the key or key/value pair.
 
-== --32 (EXPERIMENTAL)
+=head2 --32 (EXPERIMENTAL)
 
 This experimental flag tries to force as much 32-bitness as possible, even on
 a 64 bit operating system.  It's very hacky, messes with compiler and linker
 flags and is not guaranteed on all platforms.
 
-= CONFIGURATION FILE
+=head1 CONFIGURATION FILE
 
 You can put command line options into a configuration file, one per line,
-and they will be prepended to {@ARGV} before options are processed.  For
+and they will be prepended to C<< @ARGV >> before options are processed.  For
 example, here is what I have in my config file.
 
     --install_root=/opt/perl
@@ -188,16 +188,15 @@ example, here is what I have in my config file.
     -D cf_email='dagolden@cpan.org'
     -D perladmin='dagolden@cpan.org'
 
-To edit the config file, be sure your {EDITOR} environment variable is set
-and then run {grindperl --edit}.
+To edit the config file, be sure your C<< EDITOR >> environment variable is set
+and then run C<< grindperl --edit >>.
 
-= CAVEATS
+=head1 CAVEATS
 
+=for :list
 * You must have git installed and in your path
 * This depends on certain shell redirection constructs and is unlikely to
-work on non-POSIX systems
-
-=end wikidoc
+  work on non-POSIX systems
 
 =cut
 
