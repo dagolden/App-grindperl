@@ -166,9 +166,12 @@ Outputs some extra progress messages and warnings.
 
 =head2 --undefine KEY or -U KEY
 
-May be specified multiple times with different values of KEY.  These
-set the C<< -D >> and C<< -U >> options for C<< Configure >>.  Not that unlike C<< Configure >>,
-these require a space between the option and the key or key/value pair.
+=head2 --additions KEY=VALUE or -A KEY=VALUE
+
+May be specified multiple times with different values of KEY.  These set
+the C<< -D >>, C<< -U >> and C<< -A >> options for C<< Configure >>.  Note
+that unlike C<< Configure >>, these require a space between the option and
+the key or key/value pair.
 
 =head2 --32 (EXPERIMENTAL)
 
@@ -187,6 +190,8 @@ example, here is what I have in my config file.
     -D cf_by=dagolden
     -D cf_email='dagolden@cpan.org'
     -D perladmin='dagolden@cpan.org'
+    -D optimize=-g
+    -A ccflags=-DPERL_USE_SAFE_PUTENV
 
 To edit the config file, be sure your C<< EDITOR >> environment variable is set
 and then run C<< grindperl --edit >>.

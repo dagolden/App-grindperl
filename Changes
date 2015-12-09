@@ -2,6 +2,10 @@ Revision history for App-grindperl
 
 {{$NEXT}}
 
+    [ADDED]
+
+    - Added the '-A' flag for Configure
+
 0.003     2015-02-22 06:56:11-05:00 America/New_York
 
     [DOCS]

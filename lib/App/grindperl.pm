@@ -39,6 +39,7 @@ sub new {
     Switch("man"),
     Switch("edit"),
     Switch("verbose|v"),
+    Keypair("additions|A"),
     Keypair("define|D"),
     List("undefine|U"),
   ]);
@@ -97,6 +98,7 @@ sub configure_args {
   my ($self) = @_;
   my %defines = $self->opt->get_define;
   my @undefines = $self->opt->get_undefine;
+  my %additions = $self->opt->get_additions;
   my @args = qw/-des -Dusedevel -Uversiononly/;
   push @args, "-Dusethreads" if $self->opt->get_threads;
   push @args, "-DDEBUGGING" if $self->opt->get_debugging;
@@ -109,6 +111,7 @@ sub configure_args {
   }
   push @args, map { "-D$_=$defines{$_}" } keys %defines;
   push @args, map { "-U$_" } @undefines;
+  push @args, map { "-A$_=$additions{$_}" } keys %additions;
   push @args, "-Dprefix=" . $self->prefix;
   return @args;
 }
