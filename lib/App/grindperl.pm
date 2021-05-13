@@ -7,7 +7,7 @@ our $VERSION = '0.005';
 
 use autodie;
 use Getopt::Long::Descriptive;
-use Path::Class;
+use Path::Tiny;
 use File::Spec;
 use Carp qw/carp croak/;
 use File::Copy qw/copy/;
@@ -103,11 +103,11 @@ sub prefix {
       $describe = 'unknown-commit';
     }
     chomp $describe;
-    return dir($root)->subdir("$branch-$describe");
+    return path($root)->child("$branch-$describe");
   }
   else {
-    my $perldir = dir()->absolute->basename;
-    return dir($root)->subdir("$perldir-" . time());
+    my $perldir = path('.')->absolute->basename;
+    return path($root)->child("$perldir-" . time());
   }
 }
 
@@ -135,20 +135,20 @@ sub configure_args {
 
 sub cache_dir {
   my ($self) = @_;
-  return dir(File::HomeDir->my_dist_data('App-grindperl', {create=>1}))->stringify;
+  return path(File::HomeDir->my_dist_data('App-grindperl', {create=>1}))->stringify;
 }
 
 sub cache_file {
   my ($self,$file) = @_;
   croak "No filename given to cache_file()"
     unless defined $file && length $file;
-  return file( $self->cache_dir, $file )->stringify;
+  return path( $self->cache_dir, $file )->stringify;
 }
 
 sub config_file {
   my ($self) = @_;
-  my $config_dir = dir(File::HomeDir->my_dist_config('App-grindperl', {create=>1}));
-  return $config_dir->file("grindperl.conf");
+  my $config_dir = path(File::HomeDir->my_dist_config('App-grindperl', {create=>1}));
+  return $config_dir->child("grindperl.conf");
 }
 
 sub read_config_file {
@@ -176,7 +176,7 @@ sub do_cmd {
 
 sub verify_dir {
   my ($self) = @_;
-  my $prefix = dir($self->prefix);
+  my $prefix = path($self->prefix);
   return -w $prefix->parent;
 }
 
@@ -205,7 +205,7 @@ sub configure {
     or croak("Configure failed!");
 
   # save files back into cache if updated
-  dir( $self->cache_dir )->mkpath;
+  path( $self->cache_dir )->mkpath;
   for my $f ( qw/config.sh Policy.sh/ ) {
     copy( $f, $self->cache_file($f) )
       if (! -f $self->cache_file($f)) || (-M $f > -M $self->cache_file($f));
@@ -234,7 +234,7 @@ sub run {
 
   my $prefix = $self->prefix;
   die "Can't install to $prefix\: parent directory is not writeable\n"
-    unless -w dir($prefix)->parent;
+    unless -w path($prefix)->parent;
 
   if ( $self->is_git ) {
     $self->do_cmd("git clean -dxf")
